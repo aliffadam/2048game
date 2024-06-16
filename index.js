@@ -44,7 +44,6 @@ app.post('/register', async (req, res) => {
       } else {
          client.db("2048_game").collection("users").insertOne({
             "username": req.body.username,
-            "email": req.body.email,
             "password": req.body.password
          })
          res.send('Register successfully')
