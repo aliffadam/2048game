@@ -8,7 +8,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = "mongodb+srv://b022110114:Wanasofea01@zawanah.yaxiom4.mongodb.net/?retryWrites=true&w=majority&appName=Zawanah";
+const uri = "mongodb+srv://b022110114:Wanasofea01@zawanah.yaxiom4.mongodb.net/?retryWrites=true&w=majority&appName=Zawanahe";
 
 const client = new MongoClient(uri, {
    serverApi: {
@@ -28,6 +28,7 @@ async function run() {
 }
 run().catch(console.dir);
 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
@@ -43,7 +44,7 @@ app.post('/register', async (req, res) => {
       const existingUser = await client.db("2048_game").collection("users").findOne({ username });
 
       if (existingUser) {
-         return res.status(400).send('Username already exists');
+         return res.status(400).json({ message: 'Username already exists' });
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -53,10 +54,10 @@ app.post('/register', async (req, res) => {
          password: hashedPassword
       });
 
-      res.send('Register successfully');
+      res.status(200).json({ message: 'Register successfully' });
    } catch (error) {
       console.error(error);
-      res.status(500).send('Internal Server Error');
+      res.status(500).json({ message: 'Internal Server Error' });
    }
 });
 
