@@ -1,5 +1,4 @@
 <html>
-
 <body>
    <center>
       <form action="" id="loginForm">
@@ -24,41 +23,32 @@
       loginForm.addEventListener("submit", (e) => {
          e.preventDefault();
 
-         let username = document.getElementById("username");
-         let password = document.getElementById("password");
+         let username = document.getElementById("username").value;
+         let password = document.getElementById("password").value;
 
-         if (username.value == "" || password.value == "") {
+         if (username === "" || password === "") {
             alert("Ensure you input a value in both fields!");
-         } else {
-            // perform operation with form input
-            //alert("This form has been successfully submitted!");
-            console.log(
-               `This form has a username of ${username.value} and password of ${password.value}`
-            );
-
-            var apiUrl = 'databaseandcloudsystem.azurewebsites.net/register';
-
-            fetch(apiUrl,
-               {
-                  method: "POST",
-                  headers: {
-                     "Content-Type": "application/json"
-                  },
-                  body: JSON.stringify({
-                     username: username.value,
-                     password: password.value
-                  })
-               }
-
-            ).then(response => {
-               username.value = "";
-               password.value = "";
-
-               console.log(response.json())
-            }).catch(err => {
-               console.log(err)
-            });
+            return;
          }
+
+         var apiUrl = 'databaseandcloudsystem.azurewebsites.net/register';
+
+         fetch(apiUrl, {
+            method: "POST",
+            headers: {
+               "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ username, password })
+         })
+         .then(response => response.json())
+         .then(data => {
+            console.log(data);
+            alert(data.message || 'Registration successful!');
+         })
+         .catch(err => {
+            console.error(err);
+            alert('An error occurred. Please try again.');
+         });
       });
    </script>
 </body>
