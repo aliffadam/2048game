@@ -86,6 +86,42 @@ app.post('/login', async (req, res) => {
    }
 });
 
+// Example: Add leaderboard routes and MongoDB operations
+
+// Endpoint to fetch leaderboard entries
+app.get('/leaderboard', async (req, res) => {
+    try {
+        const leaderboard = await client.db("2048_game").collection("leaderboard")
+            .find()
+            .sort({ score: -1 }) // Sort by score descending
+            .limit(10) // Limit to top 10 entries
+            .toArray();
+
+        res.status(200).json({ success: true, leaderboard });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+
+// Endpoint to add new score to leaderboard
+app.post('/leaderboard', async (req, res) => {
+    try {
+        const { username, score } = req.body;
+
+        await client.db("2048_game").collection("leaderboard").insertOne({
+            username,
+            score,
+            date: new Date()
+        });
+
+        res.status(200).json({ success: true, message: 'Score added to leaderboard' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+
 app.listen(port, () => {
    console.log(`App listening on port ${port}`);
 });

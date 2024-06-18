@@ -188,3 +188,26 @@ function hasEmptyTile() {
     return false;
 }
 
+function endGame() {
+    // Assuming you have a way to retrieve the username and final score
+    const username = "Player1"; // Replace with actual username retrieval logic
+    const finalScore = score; // Assuming 'score' is the final score
+
+    // Example fetch request to send score to leaderboard endpoint
+    fetch('/leaderboard', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ username, score: finalScore })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Score added to leaderboard:', data);
+        // Handle success (optional)
+    })
+    .catch(error => {
+        console.error('Error adding score to leaderboard:', error);
+        // Handle error (optional)
+    });
+}
