@@ -396,38 +396,41 @@
         });
 
         document.getElementById('login-form').addEventListener("submit", (e) => {
-            e.preventDefault();
+        e.preventDefault();
 
-            let email = document.getElementById("login-email").value;
-            let password = document.getElementById("login-password").value;
+        let email = document.getElementById("login-email").value;
+        let password = document.getElementById("login-password").value;
 
-            if (email === "" || password === "") {
-                alert("Ensure you input a value in both fields!");
-                return;
+        if (email === "" || password === "") {
+            alert("Ensure you input a value in both fields!");
+            return;
+        }
+    
+        var apiUrl = "http://localhost:3000/login";
+
+        fetch(apiUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email, password })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (!data.success) {
+                throw new Error(data.message || 'Unknown error');
             }
-
-            var apiUrl = 'http://localhost:3000/login';
-
-            fetch(apiUrl, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ email, password })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (!data.success) {
-                    throw new Error(data.message || 'Unknown error');
-                }
-                alert(data.message);
-                localStorage.setItem('token', data.token);
-            })
-            .catch(err => {
-                console.error(err);
-                alert('An error occurred: ' + err.message);
-            });
+            alert(data.message);
+            localStorage.setItem('token', data.token);
+            // Redirect to game.html after successful login
+            window.location.href = "2048.html";
+        })
+        .catch(err => {
+            console.error(err);
+            alert('An error occurred: ' + err.message);
         });
+    });
     </script>
+
 </body>
 </html>
