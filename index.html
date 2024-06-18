@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,14 +8,14 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
 
-        *{
-            margin:0;
-            padding:0;
+        * {
+            margin: 0;
+            padding: 0;
             box-sizing: border-box;
             font-family: 'Poppins', sans-serif;
         }
 
-        body{
+        body {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -26,7 +25,7 @@
             background-position: center;
         }
 
-        header{
+        header {
             position: fixed;
             top: 0;
             left: 0;
@@ -52,6 +51,7 @@
             text-decoration: none;
             font-weight: 500;
             margin-left: 40px;
+            cursor: pointer;
         }
 
         .navigation a::after {
@@ -73,54 +73,6 @@
             transform: scaleX(1);
         }
 
-        .image-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            width: 400px;
-            height: auto;
-            background: rgba(255, 255, 255, 0.8);
-            border: 2px solid rgba(255, 255, 255, .5);
-            border-radius: 20px;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 0 30px rgba(0, 0, 0, .5);
-            transform: translate(-50%, -50%) scale(0);
-            transition: transform .5s ease;
-            z-index: 100;
-        }
-
-        .image-popup.active-popup {
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        .image-popup .icon-close {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 45px;
-            height: 45px;
-            background: rgb(61, 27, 27);
-            font-size: 2em;
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-bottom-left-radius: 20px;
-            cursor: pointer;
-            z-index: 1;
-        }
-
-        .image-popup .image-container {
-            padding: 20px;
-            text-align: center;
-        }
-
-        .image-popup .image-container img {
-            max-width: 100%;
-            border-radius: 10px;
-        }
-
-
         .navigation .btnlogin-popup {
             width: 130px;
             height: 50px;
@@ -139,6 +91,65 @@
         .navigation .btnlogin-popup:hover {
             background: #fff;
             color: rgb(61, 27, 27);
+        }
+
+        .popup-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity .5s, visibility .5s;
+            z-index: 100;
+        }
+
+        .popup-wrapper.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .popup-content {
+            position: relative;
+            background: #fff;
+            padding: 10px; 
+            max-width: 80%; 
+            max-height: 80%; 
+            overflow: auto; 
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, .5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .popup-content img {
+            max-width: 100%; 
+            max-height: 100%;
+            border-radius: 10px;
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 45px;
+            height: 45px;
+            background: rgb(61, 27, 27);
+            font-size: 3em;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom-left-radius: 20px;
+            cursor: pointer;
+            z-index: 1;
         }
 
         .wrapper {
@@ -315,23 +326,22 @@
         }
     </style>
 </head>
-
 <body>
     <header>
         <h2 class="logo">2048 GAME</h2>
         <nav class="navigation">
-            <a href="#">Info</a>
+            <a href="#" class="info-link">Info</a>
             <a href="#">Leaderboard</a>
             <button class="btnlogin-popup">Login</button>
         </nav>
     </header>
 
-    <div class="image-popup">
-        <span class="icon-close"><ion-icon name="close"></ion-icon></span>
-        <div class="image-container">
-            <img src="image.jpg" alt="Info Image">
+    <div class="popup-wrapper" id="info-popup">
+        <div class="popup-content">
+            <span class="popup-close">&times;</span>
+            <img src="info.jpg" alt="Info Image">
         </div>
-    </div>    
+    </div>
 
     <div class="wrapper">
         <span class="icon-close"><ion-icon name="close"></ion-icon></span>
@@ -390,17 +400,18 @@
 
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
-
+    
     <script>
+        // Your JavaScript code goes here
         const wrapper = document.querySelector('.wrapper');
         const register = document.querySelector('.form-box.register');
         const loginlink = document.querySelector('.login-link');
         const registerlink = document.querySelector('.register-link');
         const btnPopup = document.querySelector('.btnlogin-popup');
         const iconClose = document.querySelector('.icon-close');
-        const imagePopup = document.querySelector('.image-popup');
-        const infoLink = document.querySelector('.navigation a[href="#"]'); // Adjust this if your href is different
-        const imageClose = document.querySelector('.image-popup .icon-close');
+        const infoLink = document.querySelector('.info-link');
+        const infoPopup = document.getElementById('info-popup');
+        const popupClose = document.querySelector('.popup-close');
 
         registerlink.addEventListener('click', () => {
             wrapper.classList.add('active');
@@ -410,21 +421,20 @@
             wrapper.classList.remove('active');
         });
 
-        infoLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            imagePopup.classList.add('active-popup');
-        });
-
-        imageClose.addEventListener('click', () => {
-            imagePopup.classList.remove('active-popup');
-        });
-
         btnPopup.addEventListener('click', () => {
             wrapper.classList.add('active-popup');
         });
 
         iconClose.addEventListener('click', () => {
             wrapper.classList.remove('active-popup');
+        });
+
+        infoLink.addEventListener('click', () => {
+            infoPopup.classList.add('active');
+        });
+
+        popupClose.addEventListener('click', () => {
+            infoPopup.classList.remove('active');
         });
 
         document.getElementById('register-form').addEventListener("submit", (e) => {
@@ -497,6 +507,5 @@
         });
     });
     </script>
-
 </body>
 </html>
