@@ -8,19 +8,16 @@ window.onload = function() {
 }
 
 function setGame() {
-    // board = [
-    //     [2, 2, 2, 2],
-    //     [2, 2, 2, 2],
-    //     [4, 4, 8, 8],
-    //     [4, 4, 8, 8]
-    // ];
-
     board = [
         [0, 0, 0, 0],
         [0, 0, 0, 0],
         [0, 0, 0, 0],
         [0, 0, 0, 0]
-    ]
+    ];
+
+    score = 0;
+    document.getElementById("score").innerText = score;
+    document.getElementById("board").innerHTML = "";
 
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < columns; c++) {
@@ -29,68 +26,65 @@ function setGame() {
             let num = board[r][c];
             updateTile(tile, num);
             document.getElementById("board").append(tile);
+            setTilePosition(tile, r, c);
         }
     }
-    //create 2 to begin the game
     setTwo();
     setTwo();
-
 }
 
 function updateTile(tile, num) {
     tile.innerText = "";
-    tile.classList.value = ""; //clear the classList
+    tile.classList.value = "";
     tile.classList.add("tile");
     if (num > 0) {
         tile.innerText = num.toString();
         if (num <= 4096) {
-            tile.classList.add("x"+num.toString());
+            tile.classList.add("x" + num.toString());
         } else {
             tile.classList.add("x8192");
-        }                
+        }
     }
+}
+
+function setTilePosition(tile, row, col) {
+    tile.style.transform = `translate(${col * 100}px, ${row * 100}px)`;
 }
 
 document.addEventListener('keyup', (e) => {
     if (e.code == "ArrowLeft") {
         slideLeft();
         setTwo();
-    }
-    else if (e.code == "ArrowRight") {
+    } else if (e.code == "ArrowRight") {
         slideRight();
         setTwo();
-    }
-    else if (e.code == "ArrowUp") {
+    } else if (e.code == "ArrowUp") {
         slideUp();
         setTwo();
-
-    }
-    else if (e.code == "ArrowDown") {
+    } else if (e.code == "ArrowDown") {
         slideDown();
         setTwo();
     }
     document.getElementById("score").innerText = score;
-})
+});
 
-function filterZero(row){
-    return row.filter(num => num != 0); //create new array of all nums != 0
+function filterZero(row) {
+    return row.filter(num => num != 0);
 }
 
 function slide(row) {
-    //[0, 2, 2, 2] 
-    row = filterZero(row); //[2, 2, 2]
-    for (let i = 0; i < row.length-1; i++){
-        if (row[i] == row[i+1]) {
+    row = filterZero(row);
+    for (let i = 0; i < row.length - 1; i++) {
+        if (row[i] == row[i + 1]) {
             row[i] *= 2;
-            row[i+1] = 0;
+            row[i + 1] = 0;
             score += row[i];
         }
-    } //[4, 0, 2]
-    row = filterZero(row); //[4, 2]
-    //add zeroes
+    }
+    row = filterZero(row);
     while (row.length < columns) {
         row.push(0);
-    } //[4, 2, 0, 0]
+    }
     return row;
 }
 
@@ -99,24 +93,26 @@ function slideLeft() {
         let row = board[r];
         row = slide(row);
         board[r] = row;
-        for (let c = 0; c < columns; c++){
+        for (let c = 0; c < columns; c++) {
             let tile = document.getElementById(r.toString() + "-" + c.toString());
             let num = board[r][c];
             updateTile(tile, num);
+            setTilePosition(tile, r, c);
         }
     }
 }
 
 function slideRight() {
     for (let r = 0; r < rows; r++) {
-        let row = board[r];         //[0, 2, 2, 2]
-        row.reverse();              //[2, 2, 2, 0]
-        row = slide(row)            //[4, 2, 0, 0]
-        board[r] = row.reverse();   //[0, 0, 2, 4];
-        for (let c = 0; c < columns; c++){
+        let row = board[r];
+        row.reverse();
+        row = slide(row);
+        board[r] = row.reverse();
+        for (let c = 0; c < columns; c++) {
             let tile = document.getElementById(r.toString() + "-" + c.toString());
             let num = board[r][c];
             updateTile(tile, num);
+            setTilePosition(tile, r, c);
         }
     }
 }
@@ -125,15 +121,12 @@ function slideUp() {
     for (let c = 0; c < columns; c++) {
         let row = [board[0][c], board[1][c], board[2][c], board[3][c]];
         row = slide(row);
-        // board[0][c] = row[0];
-        // board[1][c] = row[1];
-        // board[2][c] = row[2];
-        // board[3][c] = row[3];
-        for (let r = 0; r < rows; r++){
+        for (let r = 0; r < rows; r++) {
             board[r][c] = row[r];
             let tile = document.getElementById(r.toString() + "-" + c.toString());
             let num = board[r][c];
             updateTile(tile, num);
+            setTilePosition(tile, r, c);
         }
     }
 }
@@ -144,15 +137,12 @@ function slideDown() {
         row.reverse();
         row = slide(row);
         row.reverse();
-        // board[0][c] = row[0];
-        // board[1][c] = row[1];
-        // board[2][c] = row[2];
-        // board[3][c] = row[3];
-        for (let r = 0; r < rows; r++){
+        for (let r = 0; r < rows; r++) {
             board[r][c] = row[r];
             let tile = document.getElementById(r.toString() + "-" + c.toString());
             let num = board[r][c];
             updateTile(tile, num);
+            setTilePosition(tile, r, c);
         }
     }
 }
@@ -163,24 +153,25 @@ function setTwo() {
     }
     let found = false;
     while (!found) {
-        //find random row and column to place a 2 in
         let r = Math.floor(Math.random() * rows);
         let c = Math.floor(Math.random() * columns);
         if (board[r][c] == 0) {
-            board[r][c] = 2;
+            board[r][c] = Math.random() < 0.9 ? 2 : 4; // 90% chance of 2, 10% chance of 4
             let tile = document.getElementById(r.toString() + "-" + c.toString());
-            tile.innerText = "2";
-            tile.classList.add("x2");
+            updateTile(tile, board[r][c]);
+            setTilePosition(tile, r, c);
             found = true;
         }
+    }
+    if (isGameOver()) {
+        alert("Game Over!");
     }
 }
 
 function hasEmptyTile() {
-    let count = 0;
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < columns; c++) {
-            if (board[r][c] == 0) { //at least one zero in the board
+            if (board[r][c] == 0) {
                 return true;
             }
         }
@@ -188,26 +179,24 @@ function hasEmptyTile() {
     return false;
 }
 
-function endGame() {
-    // Assuming you have a way to retrieve the username and final score
-    const username = "Player1"; // Replace with actual username retrieval logic
-    const finalScore = score; // Assuming 'score' is the final score
-
-    // Example fetch request to send score to leaderboard endpoint
-    fetch('/leaderboard', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username, score: finalScore })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Score added to leaderboard:', data);
-        // Handle success (optional)
-    })
-    .catch(error => {
-        console.error('Error adding score to leaderboard:', error);
-        // Handle error (optional)
-    });
+function isGameOver() {
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < columns; c++) {
+            if (board[r][c] == 0) {
+                return false; // Empty tile exists
+            }
+            if (r < rows - 1 && board[r][c] == board[r + 1][c]) {
+                return false; // Vertical merge possible
+            }
+            if (c < columns - 1 && board[r][c] == board[r][c + 1]) {
+                return false; // Horizontal merge possible
+            }
+        }
+    }
+    return true; // No moves left
 }
+
+// Restart button functionality
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("restartButton").addEventListener("click", setGame);
+});
