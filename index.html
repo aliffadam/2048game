@@ -149,6 +149,96 @@
             z-index: 1;
         }
 
+        .popup-board {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotateY(180deg) scale(0.8);
+            background: transparent;
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            width: 70%;
+            max-width: 900px;
+            height: 70%; /* Ensure the container has a fixed height */
+            max-height: 80%;
+            overflow: auto; /* Enable scrolling */
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgb(61, 27, 27);
+            color: rgb(61, 27, 27);
+            opacity: 0;
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.4s ease;
+            animation: rotateIn 0.8s ease forwards;
+        }
+
+        .popup-board.active {
+            display: block;
+            transform: translate(-50%, -50%) rotateY(0deg) scale(1);
+            opacity: 1;
+        }
+
+        .popup-board h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .popup-close.leaderboard-close {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 45px;
+            height: 45px;
+            background: rgb(61, 27, 27);
+            font-size: 3em;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-bottom-left-radius: 20px;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .popup-close.leaderboard-close:hover {
+            transform: scale(1); /* Scale up on hover */
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 12px 20px;
+            text-align: left;
+        }
+
+        .leaderboard-table th {
+            background-color: #ffffff62;
+            font-weight: bold;
+        }
+
+        .leaderboard-table tbody tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .leaderboard-table tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes rotateIn {
+            0% {
+                transform: translate(-50%, -50%) rotateY(180deg) scale(0.8);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(-50%, -50%) rotateY(0deg) scale(1);
+                opacity: 1;
+            }
+        }
+
         .wrapper {
             position: relative;
             width: 400px;
@@ -321,6 +411,7 @@
         .login-register p a:hover {
             text-decoration: underline;
         }
+
     </style>
 </head>
 <body>
@@ -328,7 +419,7 @@
         <h2 class="logo">2048 GAME</h2>
         <nav class="navigation">
             <a href="#" class="info-link">Info</a>
-            <a href="#">Leaderboard</a>
+            <a href="#" class="leaderboard-link">Leaderboard</a>
             <button class="btnlogin-popup">Login</button>
         </nav>
     </header>
@@ -337,6 +428,25 @@
         <div class="popup-content">
             <span class="popup-close">&times;</span>
             <img src="info.jpg" alt="Info Image">
+        </div>
+    </div>
+
+    <div class="popup-board" id="leaderboard-popup">
+        <div class="popup-ranking">
+            <span class="popup-close leaderboard-close">&times;</span>
+            <h2>Leaderboard</h2>
+            <table id="leaderboard-table" class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Leaderboard entries will be added here -->
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -408,7 +518,10 @@
         const infoLink = document.querySelector('.info-link');
         const infoPopup = document.getElementById('info-popup');
         const popupClose = document.querySelector('.popup-close');
-
+        const leaderboardLink = document.querySelector('.leaderboard-link');
+        const leaderboardPopup = document.getElementById('leaderboard-popup');
+        const leaderboardClose = document.querySelector('.leaderboard-close');
+        
         registerlink.addEventListener('click', () => {
             wrapper.classList.add('active');
         });
@@ -502,6 +615,35 @@
             alert('An error occurred: ' + err.message);
         });
     });
+
+    leaderboardLink.addEventListener('click', (event) => {
+        event.preventDefault();
+        fetchLeaderboard();
+        leaderboardPopup.classList.add('active');
+    });
+
+    leaderboardClose.addEventListener('click', () => {
+        leaderboardPopup.classList.remove('active');
+    });
+
+    function fetchLeaderboard() {
+    fetch('http://localhost:3000/leaderboard')
+        .then(response => response.json())
+        .then(data => {
+            const leaderboardTable = document.getElementById('leaderboard-table').querySelector('tbody');
+            leaderboardTable.innerHTML = ''; // Clear previous entries
+            data.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${entry.username}</td>
+                    <td>${entry.score}</td>
+                `;
+                leaderboardTable.appendChild(row);
+            });
+        })
+        .catch(error => console.error('Error fetching leaderboard:', error));
+}
     </script>
 </body>
 </html>

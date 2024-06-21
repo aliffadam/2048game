@@ -141,6 +141,18 @@ app.post('/saveScore', verifyToken, async (req, res) => {
     }
 });
 
+app.get('/leaderboard', async (req, res) => {
+    try {
+        const leaderboard = await client.db("2048_game").collection("users")
+            .find({}, { sort: { score: -1 } })
+            .toArray();
+        res.status(200).json(leaderboard);
+    } catch (error) {
+        console.error('Error fetching leaderboard:', error);
+        res.status(500).json({ success: false, message: 'Internal Server Error' });
+    }
+});
+
 app.listen(port, () => {
    console.log(`App listening on port ${port}`);
 });
