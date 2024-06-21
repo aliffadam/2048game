@@ -558,7 +558,7 @@
                 return;
             }
 
-            var apiUrl = 'http://localhost:3000/register';
+            var apiUrl = 'https://gameio.azurewebsites.net/register';
 
             fetch(apiUrl, {
                 method: "POST",
@@ -591,7 +591,7 @@
             return;
         }
     
-        var apiUrl = "http://localhost:3000/login";
+        var apiUrl = "https://gameio.azurewebsites.net/login";
 
         fetch(apiUrl, {
             method: "POST",
@@ -627,7 +627,7 @@
     });
 
     function fetchLeaderboard() {
-    fetch('http://localhost:3000/leaderboard')
+    fetch('https://gameio.azurewebsites.net/leaderboard')
         .then(response => response.json())
         .then(data => {
             const leaderboardTable = document.getElementById('leaderboard-table').querySelector('tbody');
