@@ -1,4 +1,0 @@
-{
-    "appService.defaultWebAppToDeploy": "undefined/subscriptions/efdf9ebb-ed5b-4560-8008-2137d79c2273/resourceGroups/appsvc_linux_centralus/providers/Microsoft.Web/sites/2048gameio",
-    "appService.deploySubpath": "."
-}
