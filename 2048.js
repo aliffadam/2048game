@@ -1,5 +1,5 @@
 var board;
-var score = 0;
+var score;
 var rows = 4;
 var columns = 4;
 
@@ -147,6 +147,35 @@ function slideDown() {
     }
 }
 
+function sendScore(score) {
+    const token = localStorage.getItem('token'); // Assuming you store JWT in localStorage
+    if (!token) {
+        alert("You need to log in to save your score!");
+        return;
+    }
+
+    fetch('http://localhost:3000/saveScore', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ score })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Response from server:", data); // Add this line for debugging
+        if (data.success) {
+            alert('Score saved successfully!');
+        } else if (data.message === 'New score is not higher than current score') {
+            alert('New score is not higher than current score.');
+        } else {
+            alert('Failed to save score.');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
 function setTwo() {
     if (!hasEmptyTile()) {
         return;
@@ -165,6 +194,7 @@ function setTwo() {
     }
     if (isGameOver()) {
         alert("Game Over!");
+        sendScore(score); // Call this function when the game is over
     }
 }
 
@@ -183,20 +213,19 @@ function isGameOver() {
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < columns; c++) {
             if (board[r][c] == 0) {
-                return false; // Empty tile exists
+                return false; 
             }
             if (r < rows - 1 && board[r][c] == board[r + 1][c]) {
-                return false; // Vertical merge possible
+                return false; 
             }
             if (c < columns - 1 && board[r][c] == board[r][c + 1]) {
-                return false; // Horizontal merge possible
+                return false; 
             }
         }
     }
-    return true; // No moves left
+    return true; 
 }
 
-// Restart button functionality
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("restartButton").addEventListener("click", setGame);
 });

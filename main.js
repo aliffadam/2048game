@@ -3,11 +3,11 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
 const path = require('path');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = "mongodb+srv://b022110114:Wanasofea01@zawanah.yaxiom4.mongodb.net/?retryWrites=true&w=majority&appName=Zawanah";
 
 const client = new MongoClient(uri, {
@@ -51,7 +51,8 @@ app.post('/register', async (req, res) => {
         await client.db("2048_game").collection("users").insertOne({
             username,
             email,
-            password: hashedPassword
+            password: hashedPassword,
+            score: 0 // Initialize score to 0
         });
 
         res.status(200).json({ success: true, message: 'Registration successful' });
@@ -86,38 +87,56 @@ app.post('/login', async (req, res) => {
    }
 });
 
-// Example: Add leaderboard routes and MongoDB operations
-
-// Endpoint to fetch leaderboard entries
-app.get('/leaderboard', async (req, res) => {
-    try {
-        const leaderboard = await client.db("2048_game").collection("leaderboard")
-            .find()
-            .sort({ score: -1 }) // Sort by score descending
-            .limit(10) // Limit to top 10 entries
-            .toArray();
-
-        res.status(200).json({ success: true, leaderboard });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: 'Internal Server Error' });
+// Middleware to verify JWT
+function verifyToken(req, res, next) {
+    const token = req.headers['authorization']?.split(' ')[1];
+    if (!token) {
+        return res.status(403).json({ success: false, message: 'No token provided' });
     }
-});
 
-// Endpoint to add new score to leaderboard
-app.post('/leaderboard', async (req, res) => {
+    jwt.verify(token, 'your_jwt_secret', (err, decoded) => {
+        if (err) {
+            console.error("Failed to authenticate token:", err);
+            return res.status(500).json({ success: false, message: 'Failed to authenticate token' });
+        }
+
+        req.userId = decoded.id;
+        next();
+    });
+}
+
+// Endpoint to save the score
+app.post('/saveScore', verifyToken, async (req, res) => {
     try {
-        const { username, score } = req.body;
+        const { score } = req.body;
+        console.log("Received score:", score);
+        console.log("User ID from token:", req.userId);
 
-        await client.db("2048_game").collection("leaderboard").insertOne({
-            username,
-            score,
-            date: new Date()
-        });
+        const user = await client.db("2048_game").collection("users").findOne({ _id: new ObjectId(req.userId) });
 
-        res.status(200).json({ success: true, message: 'Score added to leaderboard' });
+        if (user) {
+            if (score > user.score) {
+                const result = await client.db("2048_game").collection("users").updateOne(
+                    { _id: new ObjectId(req.userId) },
+                    { $set: { score: score } }
+                );
+
+                if (result.modifiedCount === 1) {
+                    res.status(200).json({ success: true, message: 'Score saved successfully' });
+                } else {
+                    console.error("Failed to update score in the database");
+                    res.status(500).json({ success: false, message: 'Failed to save score' });
+                }
+            } else {
+                console.log("New score is not higher than current score");
+                res.status(200).json({ success: false, message: 'New score is not higher than current score' });
+            }
+        } else {
+            console.error("User not found");
+            res.status(404).json({ success: false, message: 'User not found' });
+        }
     } catch (error) {
-        console.error(error);
+        console.error("Error in /saveScore endpoint:", error);
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
 });
