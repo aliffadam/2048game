@@ -122,14 +122,14 @@ app.post('/saveScore', verifyToken, async (req, res) => {
                 );
 
                 if (result.modifiedCount === 1) {
-                    res.status(200).json({ success: true, message: 'Score saved successfully' });
+                    res.status(200).json({ success: true, message: 'New high score saved successfully' });
                 } else {
                     console.error("Failed to update score in the database");
                     res.status(500).json({ success: false, message: 'Failed to save score' });
                 }
             } else {
-                console.log("New score is not higher than current score");
-                res.status(200).json({ success: false, message: 'New score is not higher than current score' });
+                console.log("New score is not higher than your current score");
+                res.status(200).json({ success: false, message: 'New score is not higher than your current score' });
             }
         } else {
             console.error("User not found");

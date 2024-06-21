@@ -166,9 +166,9 @@ function sendScore(score) {
     .then(data => {
         console.log("Response from server:", data); // Add this line for debugging
         if (data.success) {
-            alert('Score saved successfully!');
-        } else if (data.message === 'New score is not higher than current score') {
-            alert('New score is not higher than current score.');
+            alert('New high score saved successfully!');
+        } else if (data.message === 'New score is not higher than your current score') {
+            alert('New score is not higher than your current score.');
         } else {
             alert('Failed to save score.');
         }
