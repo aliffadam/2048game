@@ -154,7 +154,7 @@ function sendScore(score) {
         return;
     }
 
-    fetch('http://localhost:3000/saveScore', {
+    fetch('https://databaseandcloudsystem.azurewebsites.net/saveScore', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
